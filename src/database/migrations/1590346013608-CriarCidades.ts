@@ -1,10 +1,15 @@
-import { MigrationInterface, QueryRunner, Table } from 'typeorm';
+import {
+  MigrationInterface,
+  QueryRunner,
+  Table,
+  TableForeignKey,
+} from 'typeorm';
 
-export default class CriarEstados1590116778099 implements MigrationInterface {
+export default class CriarCidades1590346013608 implements MigrationInterface {
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.createTable(
       new Table({
-        name: 'estados',
+        name: 'cidades',
         columns: [
           {
             name: 'id',
@@ -19,14 +24,13 @@ export default class CriarEstados1590116778099 implements MigrationInterface {
             isUnique: true,
           },
           {
-            name: 'sigla',
-            type: 'varchar',
-            isUnique: true,
-          },
-          {
             name: 'nome',
             type: 'varchar',
-            isUnique: true,
+          },
+          {
+            name: 'estado_id',
+            type: 'integer',
+            isNullable: true,
           },
           {
             name: 'ativo',
@@ -45,9 +49,22 @@ export default class CriarEstados1590116778099 implements MigrationInterface {
         ],
       }),
     );
+
+    await queryRunner.createForeignKey(
+      'cidades',
+      new TableForeignKey({
+        name: 'CidadeEstado',
+        columnNames: ['estado_id'],
+        referencedColumnNames: ['id'],
+        referencedTableName: 'estados',
+        onDelete: 'SET NULL',
+        onUpdate: 'CASCADE',
+      }),
+    );
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {
-    await queryRunner.dropTable('estados');
+    await queryRunner.dropForeignKey('cidades', 'CidadeEstado');
+    await queryRunner.dropTable('cidades');
   }
 }
